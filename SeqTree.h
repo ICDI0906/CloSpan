@@ -8,6 +8,8 @@
 #define _FIND_FREQUENT_SEQS
 #define _CALC_I_NUM_OF_ITEMS
 #define _ANOTHER_CLOSED_APPROACH
-
+#if defined (_ANOTHER_CLOSED_APPROACH)
+//#include "ClosedTree.h"
+#endif
 
 #endif //CLOSPAN_STUDY_SEQTREE_H
