@@ -37,23 +37,27 @@ struct mem_map* CreateMemMap(const char* mem_file, const unsigned int nWndSize){
     struct mem_map* pMem=(struct mem_map*)memalloc(sizeof(struct mem_map));
     int nMode = 420;
 
-    pMem->m_hFile = open(mem_file, O_RDONLY, nMode);
-    if (pMem->m_hFile==-1) {
-        fprintf(gpErrFile, "Failed to open memory file '%s'.\n", mem_file);
-        ReportError();
-        freemem ((void**) &pMem);
-        exit(1);
-    }
+    pMem->m_hFile = open(mem_file, O_RDONLY, nMode);  // O_RDONLY 只读，O_WRONLY 只写 O_RDWR 可读可写
+            // 返回的是磁盘上文件的大小，单位为kb
+
+        if (pMem->m_hFile==-1) {
+            fprintf(gpErrFile, "Failed to open memory file '%s'.\n", mem_file);
+            ReportError();
+            freemem ((void**) &pMem);
+            exit(1);
+        }
 
     pMem->m_nCurWnd = 0;
     pMem->m_nFileSize = lseek (pMem->m_hFile, 0, SEEK_END);
+
+
     lseek (pMem->m_hFile, 0, SEEK_SET);
     if (pMem->m_nFileSize <= nWndSize) pMem->m_nWndSize = pMem->m_nFileSize;
-    else pMem->m_nWndSize = nWndSize;
-
+    else pMem->m_nWndSize = nWndSize;   //限制一下内存的大小
+    // mmap 将数据映射到内存中
     pMem->m_lpMemViewFile = mmap(0, pMem->m_nWndSize,
                                  PROT_READ, MAP_SHARED,
-                                 pMem->m_hFile, 0);
+                                 pMem->m_hFile, 0); // 只读方式映射，并且可以让别的也映射到这个地址
     if (pMem->m_lpMemViewFile == MAP_FAILED){
         fprintf(gpErrFile, "Failed to create view of memory map-file.\n");
         ReportError();
@@ -61,9 +65,16 @@ struct mem_map* CreateMemMap(const char* mem_file, const unsigned int nWndSize){
         freemem ((void**) &pMem);
         exit(1);
     }
-
+//    printf("pMem->m_nFileSize %d -- %d",pMem->m_nFileSize,nWndSize);
     if (pMem->m_nFileSize <= nWndSize){
         pMem->m_pLastAddr = ((char*)(pMem->m_lpMemViewFile) + pMem->m_nFileSize);
+        // view data;bytes encode
+        /*
+        char * tmp = (char *)pMem->m_lpMemViewFile;
+        for(;tmp < pMem->m_pLastAddr;tmp ++){
+            printf("%c  ---- \n",*tmp);
+        }
+         */
     } else {
         int *dataset = (int*) ((char*)(pMem->m_lpMemViewFile) + pMem->m_nWndSize);
         for (; *dataset!=-2; dataset--);

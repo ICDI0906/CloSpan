@@ -133,7 +133,7 @@ int main(int argc, char ** argv) {
 //        printf ("Usage: 1LPrefixSpan <filename> <support> <itemcount>\n");
 //        exit (-1);
 //    }
-    InitApp("data.in", 1.0, 1);
+    InitApp("data.in", 1.0, 2);
     ResetTimer(0);
     /////////////////
 

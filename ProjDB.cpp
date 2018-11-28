@@ -19,10 +19,6 @@
 int n_proj_db =0;   // number of projected sequences processed.
 int n_max_mem=0;		// maximum memory usage by projected databases.
 int n_total_mem=0;	// total memory usage by projected databases.
-//struct COUNTER* inter=NULL;
-//struct COUNTER* intra=NULL;
-//int* inter_freq_idx=NULL;
-//int* intra_freq_idx=NULL;
 struct mem_map	*pDatasetMemMap=NULL;
 //////////////////////////////////////////////////////////////////////
 // functions.
@@ -53,6 +49,14 @@ struct PROJ_DB* make_projdb_from_org_dataset(const double dSupport,
     int i=0, j=0, nSize=0, nCount=0, nPatLen=0, nMaxSeqLen=0, nSeqLen=0;
     int *d=0, *dataset = (int*) GetStartOfMap (pDatasetMemMap);
     int *lastAddr = (int*) GetLastAddrOfMap (pDatasetMemMap);
+
+    int *tmp = dataset;
+//    char * tmp = (char * )GetStartOfMap(pDatasetMemMap);
+//    char * lasttmp = (char *) GetLastAddrOfMap(pDatasetMemMap);
+    for(; tmp != lastAddr; tmp++){
+        printf("elem :%d\n", *tmp );
+    }
+
     struct PROJ_DB* proj_db=NULL;
     struct PROJ_DB* tempDB=NULL;
     struct PROJ_SEQ* tempSeq=NULL;
@@ -60,7 +64,8 @@ struct PROJ_DB* make_projdb_from_org_dataset(const double dSupport,
 
     *pnFreqCount = 0;
 
-    fprintf(gpStatusFile, "\tCounting 1-Item sets ... \n"); fflush(gpStatusFile);
+    fprintf(gpStatusFile, "\tCounting 1-Item sets ... \n"); fflush(gpStatusFile); // 标准输出并刷新输出流
+
     ResetTimer(1);
 
     memset( inter_freq_idx, 0, sizeof(int)*gN_ITEMS );
